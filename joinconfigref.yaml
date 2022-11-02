@@ -1,0 +1,12 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: JoinConfiguration
+nodeRegistration:
+  name: '$(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")'
+  kubeletExtraArgs:
+    cloud-provider: gce
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: <>
+    token:
+    caCertHashes:
+    -
