@@ -54,4 +54,3 @@ systemctl daemon-reload
 # Set hostname as private ipv4 dnsname from the instance metadata
 
 hostnamectl set-hostname $(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")
-

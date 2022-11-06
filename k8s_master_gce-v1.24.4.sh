@@ -55,7 +55,7 @@ sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config
 
  hostnamectl set-hostname $(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")
 
-cluster_name = $1
+#cluster_name = $1
 
 # Create a kubeadm configuration file which will be used during init
 cat <<EOF> /tmp/kubeconfigold.yaml
@@ -64,7 +64,7 @@ kind: ClusterConfiguration
 apiServer:
   extraArgs:
     cloud-provider: gce
-clusterName: $cluster_name
+clusterName: kubernetes
 controlPlaneEndpoint: $(curl "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip" -H "Metadata-Flavor: Google"):6443
 controllerManager:
   extraArgs:
@@ -106,24 +106,6 @@ wget -O /tmp/calico.yaml https://docs.projectcalico.org/manifests/calico.yaml
 kubectl apply -f /tmp/calico.yaml
 
 
-#kubectl apply -k "https://github.com/kubernetes-sigs/gcp-compute-persistent-disk-csi-driver/tree/master/deploy/kubernetes/overlays/stable/?ref=release-1.8"
-test
-# Create a storageclass resource definition file
-cat <<EOF> /tmp/sc-ebs-csi.yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ebs-csi
-provisioner: ebs.csi.aws.com
-volumeBindingMode: Immediate
-parameters:
-  csi.storage.k8s.io/fstype: ext4
-  type: gp3
-  encrypted: "true"
-EOF
-#Apply the above file and create storage class. Make it default
-kubectl apply -f /tmp/sc-ebs-csi.yaml
-kubectl patch storageclass ebs-csi -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 
 echo "######### Kubernetes Cluster Creation is Complete   #########"
