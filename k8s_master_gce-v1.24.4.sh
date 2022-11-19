@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf
 apt-get update
 apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y      
