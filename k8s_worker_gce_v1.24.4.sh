@@ -57,9 +57,9 @@ systemctl daemon-reload
 
 hostnamectl set-hostname $(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")
 
-apiserver = $1
-token = $2
-cacerthash = $3
+apiserver=$1
+token=$2
+cacerthash=$3
 # Create a kubeadm configuration file which will be used during join
 cat <<EOF> /tmp/kubeconfigold.yaml
 apiVersion: kubeadm.k8s.io/v1beta2
