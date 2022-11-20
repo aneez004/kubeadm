@@ -56,3 +56,35 @@ systemctl daemon-reload
 # Set hostname as private ipv4 dnsname from the instance metadata
 
 hostnamectl set-hostname $(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")
+
+$1=apiserver
+$2=token
+$3=cacerthash
+# Create a kubeadm configuration file which will be used during join
+cat <<EOF> /tmp/kubeconfigold.yaml
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: JoinConfiguration
+nodeRegistration:
+  name: '$(curl  "http://metadata.google.internal/computeMetadata/v1/instance/hostname" -H "Metadata-Flavor: Google")'
+  kubeletExtraArgs:
+    cloud-provider: gce
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: $apiserver
+    token: $token
+    caCertHashes:
+    - $cacerthash    
+EOF
+
+#node registration name will come from the instance metadata. 
+
+
+# Migrate kubeconfig to a version compatible with the current kubeadm version
+
+kubeadm config migrate --old-config /tmp/kubeconfigold.yaml --new-config /tmp/kubeconfig.yaml
+# Creates the kubernetes cluster using the config file
+kubeadm join --config /tmp/kubeconfig.yaml
+
+# Verify that the node is added to the cluster , from the master node
+
+echo "Use kubectl commands on master node to verify that the worker node is added to the cluster and is in ready state"
